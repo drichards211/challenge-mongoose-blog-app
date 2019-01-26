@@ -6,14 +6,16 @@ const mongoose = require("mongoose");
 // const uuid = require('uuid');  
 
 
-function StorageException(message) {
-   this.message = message;
-   this.name = "StorageException";
-}
 
 // We no longer construct blog posts this way. We specify
 // a Mongo schema and then reference that with a variable
 // called BlogPosts:
+
+/* function StorageException(message) {
+   this.message = message;
+   this.name = "StorageException";
+} */
+
 /* const BlogPosts = {
   create: function(title, content, author, publishDate) {
     const post = {
@@ -65,6 +67,30 @@ function StorageException(message) {
   storage.posts = [];
   return storage;
 } */
+
+const blogPostsSchema = mongoose.Schema({
+  title: { type: String, required: true },
+  content: { type: String, required: true },
+  author: { 
+    firstName: String,
+    lastName: String,
+    required: true 
+  }
+});
+
+blogPostsSchema.virtual("authorString").get(function() {
+  return `${this.author.firstName} ${this.author.lastName}`.trim();
+});
+
+blogPostsSchema.methods.serialize = function() {
+  return {
+    id: this._id,
+    title: this.title,
+    content: this.content,
+    author: this.authorString,
+  };
+};
+
 const BlogPosts = mongoose.model("BlogPosts", blogPostsSchema);
 
 /* module.exports = {BlogPosts: createBlogPostsModel()}; */
