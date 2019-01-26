@@ -1,6 +1,7 @@
 "use strict";
 
 const mongoose = require("mongoose");
+mongoose.Promise = global.Promise;
 
 // don't need this line because the mongo database takes care of assigning IDs:
 // const uuid = require('uuid');  
