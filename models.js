@@ -74,8 +74,8 @@ const blogPostsSchema = mongoose.Schema({
   content: { type: String, required: true },
   author: { 
     firstName: String,
-    lastName: String,
-    required: true 
+    lastName: String
+    /* required: true  */
   }
 });
 
