@@ -162,6 +162,7 @@ let server
  */
 function runServer(databaseUrl, port = PORT) {
   return new Promise((resolve, reject) => {
+    console.log(databaseUrl)
     mongoose.connect(
       databaseUrl,
       err => {
@@ -212,7 +213,8 @@ function closeServer() {
  */
 
 if (require.main === module) {
-  runServer().catch(err => console.error(err))
+  // you must import DATABASE_URL here as an argument:
+  runServer(DATABASE_URL).catch(err => console.error(err)) 
 }
 
 module.exports = { app, runServer, closeServer }

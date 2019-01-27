@@ -92,7 +92,7 @@ blogPostsSchema.methods.serialize = function() {
   };
 };
 
-const BlogPosts = mongoose.model("BlogPosts", blogPostsSchema);
+const BlogPosts = mongoose.model("blogs", blogPostsSchema); // "blogs" is the name of the db.collection
 
 /* module.exports = {BlogPosts: createBlogPostsModel()}; */
 module.exports = { BlogPosts };
