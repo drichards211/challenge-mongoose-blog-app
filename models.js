@@ -70,13 +70,13 @@ mongoose.Promise = global.Promise;
 } */
 
 const blogPostsSchema = mongoose.Schema({
-  title: { type: String, required: true },
-  content: { type: String, required: true },
-  author: { 
+  author: {
     firstName: String,
     lastName: String
-    /* required: true  */
-  }
+  },
+  title: {type: String, required: true},
+  content: {type: String},
+  created: {type: Date, default: Date.now}
 });
 
 blogPostsSchema.virtual("authorString").get(function() {
@@ -89,6 +89,7 @@ blogPostsSchema.methods.serialize = function() {
     title: this.title,
     content: this.content,
     author: this.authorString,
+    created: this.created
   };
 };
 

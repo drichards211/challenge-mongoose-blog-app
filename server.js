@@ -1,14 +1,21 @@
+"use strict";
+
 const express = require('express')
+// const morgan = require('morgan')
 const mongoose = require("mongoose"); // new for mongoose
 mongoose.Promise = global.Promise; // new for mongoose
+
 const {PORT, DATABASE_URL} = require('./config'); // new for mongoose
-const router = express.Router()
-// const morgan = require('morgan')
-const bodyParser = require('body-parser')
 const {BlogPosts} = require('./models')
-const jsonParser = bodyParser.json()
+
 const app = express()
+
+app.use(express.json()); // required, or else POST req.body will be "undefined"
 // applicationCache.use(morgan('common'))
+
+const router = express.Router()
+const bodyParser = require('body-parser')
+const jsonParser = bodyParser.json()
 
 // Creating some blog posts so there's something to GET
 /* BlogPost.create('The World\'s Oceans', 'There are five of them', 'D.R.', '01-05-2019') */
@@ -39,6 +46,7 @@ app.get("/blogs/:id", (req, res) => {
 
 app.post("/blogs", (req, res) => {
   const requiredFields = ["title", "content", "author"];
+  console.log(req.body)
   for (let i = 0; i < requiredFields.length; i++) {
     const field = requiredFields[i];
     if (!(field in req.body)) {
@@ -53,7 +61,7 @@ app.post("/blogs", (req, res) => {
     content: req.body.content,
     author: req.body.author
   })
-    .then(restaurant => res.status(201).json(restaurant.serialize()))
+    .then(blogpost => res.status(201).json(blogpost.serialize()))
     .catch(err => {
       console.error(err);
       res.status(500).json({ message: "Internal server error" });
@@ -61,6 +69,8 @@ app.post("/blogs", (req, res) => {
 });
 
 app.put("/blogs/:id", (req, res) => {
+  console.log(req.body)
+  console.log(req.body.id)
   if (!(req.params.id && req.body.id && req.params.id === req.body.id)) {
     const message =
       `Request path id (${req.params.id}) and request body id ` +
@@ -71,7 +81,6 @@ app.put("/blogs/:id", (req, res) => {
 
   const toUpdate = {};
   const updateableFields = ["title", "content", "author"];
-
   updateableFields.forEach(field => {
     if (field in req.body) {
       toUpdate[field] = req.body[field];
@@ -80,13 +89,16 @@ app.put("/blogs/:id", (req, res) => {
 
   BlogPosts
     .findByIdAndUpdate(req.params.id, { $set: toUpdate })
-    .then(blogpost => res.status(204).end())
+    .then(updatedPost => res.status(204).end())
     .catch(err => res.status(500).json({ message: "Internal server error" }));
 });
 
 app.delete("/blogs/:id", (req, res) => {
   BlogPosts.findByIdAndRemove(req.params.id)
-    .then(blogpost => res.status(204).end())
+    .then(() => {
+    console.log(`Deleted blog post with id \`${req.params.id}\``);
+    res.status(204).end()
+    })
     .catch(err => res.status(500).json({ message: "Internal server error" }));
 });
 
