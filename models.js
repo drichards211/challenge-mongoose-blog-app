@@ -69,14 +69,33 @@ mongoose.Promise = global.Promise;
   return storage;
 } */
 
+var commentsSchema = mongoose.Schema({ content: 'string' });
+
+var authorSchema = mongoose.Schema({
+  firstName: 'string',
+  lastName: 'string',
+  userName: {
+    type: 'string',
+    unique: true
+  }
+});
+
 const blogPostsSchema = mongoose.Schema({
-  author: {
-    firstName: String,
-    lastName: String
-  },
   title: {type: String, required: true},
   content: {type: String},
+  author: { type: mongoose.Schema.Types.ObjectId, ref: 'Author' },
+  comments: [commentsSchema],
   created: {type: Date, default: Date.now}
+});
+
+blogPostsSchema.pre('find', function(next) {
+  this.populate('author');
+  next();
+});
+
+blogPostsSchema.pre('findOne', function(next) {
+  this.populate('author');
+  next();
 });
 
 blogPostsSchema.virtual("authorString").get(function() {
@@ -89,11 +108,14 @@ blogPostsSchema.methods.serialize = function() {
     title: this.title,
     content: this.content,
     author: this.authorString,
+    comments: this.comments,
     created: this.created
   };
 };
 
-const BlogPosts = mongoose.model("blogs", blogPostsSchema); // "blogs" is the name of the db.collection
+const BlogPosts = mongoose.model("blogposts", blogPostsSchema); // "blogposts" is the name of the db.collection???
+// Absolutely zero guidance from the course materials. I may as well be working with magic.
+var Author = mongoose.model('authors', authorSchema);
 
 /* module.exports = {BlogPosts: createBlogPostsModel()}; */
 module.exports = { BlogPosts };
